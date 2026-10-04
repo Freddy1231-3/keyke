@@ -1,0 +1,1051 @@
+--[[
+    ================================================================
+    [ SCRIPT INFORMATION ]
+    Project: Custom Script
+    Author: OYB
+    YouTube: https://www.youtube.com/channel/UCAlXXV1Hbvf7WbfXARuVtiQ
+    
+    [ TERMS AND CONDITIONS ]
+    - You ARE allowed to use and modify this script for your own games.
+    - You ARE NOT allowed to re-upload, redistribute, or claim 
+      ownership of this script.
+    - Removing or altering these credits is strictly prohibited.
+    
+    Copyright (c) 2026 OYB. All rights reserved.
+    ================================================================
+]]
+
+-- ==================== CONFIGURAÇÃO DO KEY SYSTEM ====================
+local KeySystemConfig = {
+    Secret = "20045",              -- Esta é a key correta
+    HubName = "Frederisco",
+    KeyLink = "https://example.com/getkey", -- Link opcional para pegar a key
+}
+
+-- ==================== FUNÇÃO: MOSTRAR KEY SYSTEM ====================
+local function showKeySystem(callback)
+    local CoreGui = game:GetService("CoreGui")
+    local Players = game:GetService("Players")
+
+    -- Remove GUI antiga
+    local old = CoreGui:FindFirstChild("FrederiscoKeySystem")
+    if old then old:Destroy() end
+
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "FrederiscoKeySystem"
+    screenGui.ResetOnSpawn = false
+    screenGui.Parent = CoreGui
+
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(0, 400, 0, 220)
+    frame.Position = UDim2.new(0.5, -200, 0.5, -110)
+    frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    frame.BorderSizePixel = 1
+    frame.BorderColor3 = Color3.fromRGB(60, 60, 60)
+    frame.Active = true
+    frame.Draggable = true
+    frame.Parent = screenGui
+
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(1, 0, 0, 40)
+    title.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+    title.Text = "🔐 " .. KeySystemConfig.HubName .. " - Key System"
+    title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    title.Font = Enum.Font.SourceSansBold
+    title.TextSize = 16
+    title.Parent = frame
+
+    local info = Instance.new("TextLabel")
+    info.Size = UDim2.new(0.9, 0, 0, 30)
+    info.Position = UDim2.new(0.05, 0, 0, 50)
+    info.BackgroundTransparency = 1
+    info.Text = "Insira a key para acessar o script:"
+    info.TextColor3 = Color3.fromRGB(200, 200, 200)
+    info.Font = Enum.Font.SourceSans
+    info.TextSize = 14
+    info.TextXAlignment = Enum.TextXAlignment.Left
+    info.Parent = frame
+
+    local keyBox = Instance.new("TextBox")
+    keyBox.Size = UDim2.new(0.9, 0, 0, 35)
+    keyBox.Position = UDim2.new(0.05, 0, 0, 85)
+    keyBox.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    keyBox.BorderSizePixel = 1
+    keyBox.BorderColor3 = Color3.fromRGB(80, 80, 80)
+    keyBox.Text = ""
+    keyBox.PlaceholderText = "Digite a key aqui..."
+    keyBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+    keyBox.PlaceholderColor3 = Color3.fromRGB(130, 130, 130)
+    keyBox.Font = Enum.Font.SourceSans
+    keyBox.TextSize = 16
+    keyBox.Parent = frame
+
+    local statusLabel = Instance.new("TextLabel")
+    statusLabel.Size = UDim2.new(0.9, 0, 0, 20)
+    statusLabel.Position = UDim2.new(0.05, 0, 0, 125)
+    statusLabel.BackgroundTransparency = 1
+    statusLabel.Text = ""
+    statusLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
+    statusLabel.Font = Enum.Font.SourceSansBold
+    statusLabel.TextSize = 13
+    statusLabel.Parent = frame
+
+    local verifyBtn = Instance.new("TextButton")
+    verifyBtn.Size = UDim2.new(0.9, 0, 0, 35)
+    verifyBtn.Position = UDim2.new(0.05, 0, 0, 150)
+    verifyBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 0)
+    verifyBtn.Text = "Verificar Key"
+    verifyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    verifyBtn.Font = Enum.Font.SourceSansBold
+    verifyBtn.TextSize = 16
+    verifyBtn.Parent = frame
+
+    local verifying = false
+
+    verifyBtn.MouseButton1Click:Connect(function()
+        if verifying then return end
+        local input = keyBox.Text
+
+        if input == "" then
+            statusLabel.Text = "⚠️ Digite uma key!"
+            return
+        end
+
+        verifying = true
+        statusLabel.TextColor3 = Color3.fromRGB(200, 200, 100)
+        statusLabel.Text = "🔄 Verificando..."
+        verifyBtn.Text = "Verificando..."
+
+        task.wait(1) -- Simula verificação
+
+        if input == KeySystemConfig.Secret then
+            -- ✅ Key correta: define o global e libera o script
+            _G[KeySystemConfig.Secret] = true
+            statusLabel.TextColor3 = Color3.fromRGB(0, 255, 100)
+            statusLabel.Text = "✅ Key válida! Carregando script..."
+            verifyBtn.Text = "Sucesso!"
+            task.wait(1.5)
+            screenGui:Destroy()
+            callback()
+        else
+            -- ❌ Key errada
+            statusLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
+            statusLabel.Text = "❌ Key inválida! Tente novamente."
+            verifyBtn.Text = "Verificar Key"
+            verifying = false
+            keyBox.Text = ""
+        end
+    end)
+end
+
+-- ==================== CHAMAR KEY SYSTEM, DEPOIS O SCRIPT ====================
+showKeySystem(function()
+
+    --[[
+        ⚠️ IMPORTANT: Put this code at the VERY TOP of your Main Script (before obfuscating) ⚠️
+        Este bloco roda DEPOIS que a key é validada.
+    ]]
+
+    local ProtectionConfig = {
+        SecretKey = "20045",
+        HubName = "Frederisco"
+    }
+
+    -- Anti-Bypass Logic
+    if not _G[ProtectionConfig.SecretKey] then
+        local player = game:GetService("Players").LocalPlayer
+        if player then
+            player:Kick("\n🛡️ Unauthorized Execution 🛡️\n\nPlease use the official Key System to run " .. ProtectionConfig.HubName)
+        end
+        return
+    end
+
+    print(ProtectionConfig.HubName .. " Loaded Successfully!")
+
+    -------------------------------------------------------------------------------
+    -- 👇 MAIN SCRIPT CODE STARTS HERE 👇
+    -------------------------------------------------------------------------------
+
+    -- Serviços essenciais
+    local UserInputService = game:GetService("UserInputService")
+    local VirtualInputManager = game:GetService("VirtualInputManager")
+    local Players = game:GetService("Players")
+    local RunService = game:GetService("RunService")
+    local CoreGui = game:GetService("CoreGui")
+    local TweenService = game:GetService("TweenService")
+    local LocalPlayer = Players.LocalPlayer
+
+    -- ==================== CONFIGURAÇÕES ====================
+    local CONFIG = {
+        AUTO_JJ_ENABLED = false,
+        AUTO_JJ_DELAY = 0.7,
+        AUTO_JJ_KEYS = {Enum.KeyCode.A, Enum.KeyCode.S, Enum.KeyCode.D, Enum.KeyCode.W, Enum.KeyCode.Space, Enum.KeyCode.E, Enum.KeyCode.Q},
+
+        RECORDING = false,
+        PLAYING = false,
+        RECORD_INTERVAL = 0.05,
+        LOOP_PLAYBACK = false,
+        PLAYBACK_SPEED = 1.0,
+        NOCLIP_ENABLED = false,
+        SYNC_CAMERA = false,
+
+        AIMBOT_ENABLED = false,
+        AIMBOT_FOV = 100,
+        AIMBOT_SMOOTHNESS = 0.15,
+        AIMBOT_TARGET_PART = "Head",
+        AIMBOT_TEAM_CHECK = true,
+        AIMBOT_SHOW_FOV = true,
+
+        TOGGLE_KEY = Enum.KeyCode.P,
+    }
+
+    -- ==================== VARIÁVEIS GLOBAIS ====================
+    local recordedData = {}
+    local lastRecordTime = 0
+    local currentPlaybackIndex = 1
+    local playbackStartTime = 0
+    local playbackConnection = nil
+    local recordingConnection = nil
+    local autoJJThread = nil
+    local aimbotConnection = nil
+    local fovCircle = nil
+    local mainWindow = nil
+    local screenGui = nil
+    local menuVisible = true
+    local activeTab = "Legit"
+    local noclipConnection = nil
+
+    -- ==================== FUNÇÕES AUXILIARES ====================
+    local function notify(title, text, duration)
+        pcall(function()
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = title, Text = text, Duration = duration or 3,
+            })
+        end)
+    end
+
+    local function simulateKeyPress(keyCode, holdDuration)
+        holdDuration = holdDuration or 0
+        VirtualInputManager:SendKeyEvent(true, keyCode, false, game)
+        if holdDuration > 0 then task.wait(holdDuration) end
+        VirtualInputManager:SendKeyEvent(false, keyCode, false, game)
+    end
+
+    -- ==================== AUTO JJ'S ====================
+    local function startAutoJJ()
+        if CONFIG.AUTO_JJ_ENABLED then return end
+        CONFIG.AUTO_JJ_ENABLED = true
+        notify("Auto JJ's", "Ativado!", 2)
+        autoJJThread = task.spawn(function()
+            while CONFIG.AUTO_JJ_ENABLED do
+                for _, key in ipairs(CONFIG.AUTO_JJ_KEYS) do
+                    if not CONFIG.AUTO_JJ_ENABLED then break end
+                    simulateKeyPress(key, 0.05)
+                    task.wait(CONFIG.AUTO_JJ_DELAY)
+                end
+            end
+        end)
+    end
+
+    local function stopAutoJJ()
+        CONFIG.AUTO_JJ_ENABLED = false
+        autoJJThread = nil
+        notify("Auto JJ's", "Desativado.", 2)
+    end
+
+    -- ==================== GRAVADOR DE ROTA AVANÇADO ====================
+    local function startRecording()
+        if CONFIG.RECORDING then return end
+        CONFIG.RECORDING = true
+        recordedData = {}
+        lastRecordTime = tick()
+        notify("Gravador", "Gravando rota... Mova-se!", 2)
+        recordingConnection = RunService.Heartbeat:Connect(function()
+            if not CONFIG.RECORDING then return end
+            local now = tick()
+            if now - lastRecordTime >= CONFIG.RECORD_INTERVAL then
+                lastRecordTime = now
+                local char = LocalPlayer.Character
+                if char and char:FindFirstChild("HumanoidRootPart") then
+                    local hrp = char.HumanoidRootPart
+                    local frame = {
+                        time = now,
+                        position = hrp.Position,
+                        rotation = hrp.CFrame.LookVector,
+                        velocity = hrp.Velocity,
+                        keys = {},
+                    }
+                    for _, key in ipairs(CONFIG.AUTO_JJ_KEYS) do
+                        if UserInputService:IsKeyDown(key) then
+                            table.insert(frame.keys, key)
+                        end
+                    end
+                    table.insert(recordedData, frame)
+                end
+            end
+        end)
+    end
+
+    local function stopRecording()
+        if not CONFIG.RECORDING then return end
+        CONFIG.RECORDING = false
+        if recordingConnection then recordingConnection:Disconnect(); recordingConnection = nil end
+        notify("Gravador", "Gravação finalizada! " .. #recordedData .. " frames.", 3)
+    end
+
+    local function startPlayback()
+        if CONFIG.PLAYING or #recordedData == 0 then
+            if #recordedData == 0 then notify("Gravador", "Nenhuma rota gravada!", 3) end
+            return
+        end
+        CONFIG.PLAYING = true
+        currentPlaybackIndex = 1
+        playbackStartTime = tick()
+        if CONFIG.AUTO_JJ_ENABLED then stopAutoJJ() end
+        notify("Gravador", "Reproduzindo rota...", 2)
+
+        if CONFIG.NOCLIP_ENABLED then
+            noclipConnection = RunService.Stepped:Connect(function()
+                local char = LocalPlayer.Character
+                if char then
+                    for _, part in ipairs(char:GetDescendants()) do
+                        if part:IsA("BasePart") then part.CanCollide = false end
+                    end
+                end
+            end)
+        end
+
+        playbackConnection = RunService.Heartbeat:Connect(function()
+            if not CONFIG.PLAYING then return end
+            if currentPlaybackIndex > #recordedData then
+                if CONFIG.LOOP_PLAYBACK then
+                    currentPlaybackIndex = 1
+                    playbackStartTime = tick()
+                else
+                    stopPlayback(); return
+                end
+            end
+            local frame = recordedData[currentPlaybackIndex]
+            local char = LocalPlayer.Character
+            if char and char:FindFirstChild("HumanoidRootPart") then
+                local hrp = char.HumanoidRootPart
+                local targetCF = CFrame.new(frame.position, frame.position + frame.rotation)
+                if CONFIG.PLAYBACK_SPEED ~= 1.0 then
+                    local elapsed = tick() - playbackStartTime
+                    local expectedFrame = math.floor(elapsed / CONFIG.RECORD_INTERVAL * CONFIG.PLAYBACK_SPEED) + 1
+                    if expectedFrame > currentPlaybackIndex then
+                        currentPlaybackIndex = math.min(expectedFrame, #recordedData)
+                        frame = recordedData[currentPlaybackIndex]
+                        targetCF = CFrame.new(frame.position, frame.position + frame.rotation)
+                    end
+                end
+                hrp.CFrame = targetCF
+                hrp.Velocity = frame.velocity
+            end
+            if CONFIG.SYNC_CAMERA then
+                local camera = workspace.CurrentCamera
+                if camera then
+                    camera.CFrame = CFrame.new(frame.position, frame.position + frame.rotation)
+                end
+            end
+            for _, key in ipairs(frame.keys) do
+                simulateKeyPress(key, 0.05)
+            end
+            currentPlaybackIndex = currentPlaybackIndex + 1
+        end)
+    end
+
+    local function stopPlayback()
+        CONFIG.PLAYING = false
+        if playbackConnection then playbackConnection:Disconnect(); playbackConnection = nil end
+        if noclipConnection then noclipConnection:Disconnect(); noclipConnection = nil end
+        local char = LocalPlayer.Character
+        if char then
+            for _, part in ipairs(char:GetDescendants()) do
+                if part:IsA("BasePart") then part.CanCollide = true end
+            end
+        end
+        notify("Gravador", "Reprodução parada.", 2)
+    end
+
+    local function saveRoute()
+        if #recordedData == 0 then notify("Gravador", "Nada para salvar!", 3); return end
+        local success, err = pcall(function()
+            local json = game:GetService("HttpService"):JSONEncode(recordedData)
+            writefile("route_recorder.json", json)
+        end)
+        if success then
+            notify("Gravador", "Rota salva!", 3)
+        else
+            notify("Gravador", "Erro ao salvar: " .. tostring(err), 3)
+        end
+    end
+
+    local function loadRoute()
+        local success, data = pcall(function()
+            if isfile and isfile("route_recorder.json") then
+                local content = readfile("route_recorder.json")
+                return game:GetService("HttpService"):JSONDecode(content)
+            end
+            return nil
+        end)
+        if success and data and #data > 0 then
+            recordedData = data
+            notify("Gravador", "Rota carregada! " .. #recordedData .. " frames.", 3)
+        else
+            notify("Gravador", "Nenhum arquivo encontrado.", 3)
+        end
+    end
+
+    -- ==================== AIMBOT ====================
+    local function getClosestTarget()
+        local camera = workspace.CurrentCamera
+        if not camera then return nil end
+        local screenCenter = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
+        local closest, shortestDist = nil, CONFIG.AIMBOT_FOV
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player == LocalPlayer then continue end
+            if CONFIG.AIMBOT_TEAM_CHECK and player.Team and LocalPlayer.Team and player.Team == LocalPlayer.Team then continue end
+            local char = player.Character
+            if not char then continue end
+            local part = char:FindFirstChild(CONFIG.AIMBOT_TARGET_PART)
+            if not part then continue end
+            local screenPos, onScreen = camera:WorldToScreenPoint(part.Position)
+            if not onScreen then continue end
+            local dist = (Vector2.new(screenPos.X, screenPos.Y) - screenCenter).Magnitude
+            if dist < shortestDist then
+                shortestDist = dist
+                closest = part
+            end
+        end
+        return closest
+    end
+
+    local function startAimbot()
+        if CONFIG.AIMBOT_ENABLED then return end
+        CONFIG.AIMBOT_ENABLED = true
+        notify("Aimbot", "Ativado! FOV: " .. CONFIG.AIMBOT_FOV, 2)
+        aimbotConnection = RunService.RenderStepped:Connect(function()
+            if not CONFIG.AIMBOT_ENABLED then return end
+            local target = getClosestTarget()
+            if target then
+                local camera = workspace.CurrentCamera
+                local currentCF = camera.CFrame
+                local goalCF = CFrame.new(currentCF.Position, target.Position)
+                if CONFIG.AIMBOT_SMOOTHNESS > 0 then
+                    camera.CFrame = currentCF:Lerp(goalCF, 1 - CONFIG.AIMBOT_SMOOTHNESS)
+                else
+                    camera.CFrame = goalCF
+                end
+            end
+        end)
+    end
+
+    local function stopAimbot()
+        CONFIG.AIMBOT_ENABLED = false
+        if aimbotConnection then aimbotConnection:Disconnect(); aimbotConnection = nil end
+        notify("Aimbot", "Desativado.", 2)
+    end
+
+    local function createFOVCircle()
+        if fovCircle then fovCircle:Destroy() end
+        local circle = Instance.new("Frame")
+        circle.Name = "FOVCircle"
+        circle.Size = UDim2.new(0, CONFIG.AIMBOT_FOV * 2, 0, CONFIG.AIMBOT_FOV * 2)
+        circle.Position = UDim2.new(0.5, -CONFIG.AIMBOT_FOV, 0.5, -CONFIG.AIMBOT_FOV)
+        circle.BackgroundTransparency = 1
+        circle.BorderSizePixel = 2
+        circle.BorderColor3 = Color3.fromRGB(0, 200, 255)
+        circle.Visible = CONFIG.AIMBOT_SHOW_FOV and CONFIG.AIMBOT_ENABLED
+        circle.Parent = screenGui
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(1, 0)
+        corner.Parent = circle
+        fovCircle = circle
+    end
+
+    local function updateFOVCircle()
+        if fovCircle then
+            fovCircle.Size = UDim2.new(0, CONFIG.AIMBOT_FOV * 2, 0, CONFIG.AIMBOT_FOV * 2)
+            fovCircle.Position = UDim2.new(0.5, -CONFIG.AIMBOT_FOV, 0.5, -CONFIG.AIMBOT_FOV)
+            fovCircle.Visible = CONFIG.AIMBOT_SHOW_FOV and CONFIG.AIMBOT_ENABLED
+        end
+    end
+
+    -- ==================== INTERFACE (OCTERNAL) ====================
+    local Colors = {
+        Background = Color3.fromRGB(20, 20, 20),
+        Panel = Color3.fromRGB(30, 30, 30),
+        PanelLight = Color3.fromRGB(45, 45, 45),
+        Accent = Color3.fromRGB(0, 120, 255),
+        Text = Color3.fromRGB(220, 220, 220),
+        TextDim = Color3.fromRGB(150, 150, 150),
+        Border = Color3.fromRGB(60, 60, 60),
+        Button = Color3.fromRGB(50, 50, 50),
+        Green = Color3.fromRGB(0, 180, 0),
+        Red = Color3.fromRGB(200, 0, 0),
+    }
+
+    local function createWindow()
+        local oldGui = CoreGui:FindFirstChild("OcternalUI")
+        if oldGui then oldGui:Destroy() end
+        screenGui = Instance.new("ScreenGui")
+        screenGui.Name = "OcternalUI"
+        screenGui.ResetOnSpawn = false
+        screenGui.Parent = CoreGui
+
+        mainWindow = Instance.new("Frame")
+        mainWindow.Size = UDim2.new(0, 600, 0, 450)
+        mainWindow.Position = UDim2.new(0.5, -300, 0.5, -225)
+        mainWindow.BackgroundColor3 = Colors.Background
+        mainWindow.BorderSizePixel = 1
+        mainWindow.BorderColor3 = Colors.Border
+        mainWindow.Active = true
+        mainWindow.Draggable = true
+        mainWindow.Parent = screenGui
+
+        local titleBar = Instance.new("Frame")
+        titleBar.Size = UDim2.new(1, 0, 0, 30)
+        titleBar.BackgroundColor3 = Colors.Panel
+        titleBar.BorderSizePixel = 0
+        titleBar.Parent = mainWindow
+
+        local titleText = Instance.new("TextLabel")
+        titleText.Size = UDim2.new(1, -40, 1, 0)
+        titleText.BackgroundTransparency = 1
+        titleText.Text = "Octernal - " .. ProtectionConfig.HubName
+        titleText.TextColor3 = Colors.Text
+        titleText.Font = Enum.Font.SourceSansBold
+        titleText.TextSize = 14
+        titleText.TextXAlignment = Enum.TextXAlignment.Left
+        titleText.Position = UDim2.new(0, 10, 0, 0)
+        titleText.Parent = titleBar
+
+        local closeBtn = Instance.new("TextButton")
+        closeBtn.Size = UDim2.new(0, 30, 0, 30)
+        closeBtn.Position = UDim2.new(1, -30, 0, 0)
+        closeBtn.BackgroundColor3 = Colors.Red
+        closeBtn.Text = "X"
+        closeBtn.TextColor3 = Colors.Text
+        closeBtn.Font = Enum.Font.SourceSansBold
+        closeBtn.TextSize = 18
+        closeBtn.Parent = titleBar
+        closeBtn.MouseButton1Click:Connect(function()
+            stopAutoJJ(); stopRecording(); stopPlayback(); stopAimbot()
+            screenGui:Destroy()
+        end)
+
+        local tabContainer = Instance.new("Frame")
+        tabContainer.Name = "TabContainer"
+        tabContainer.Size = UDim2.new(1, 0, 0, 30)
+        tabContainer.Position = UDim2.new(0, 0, 0, 30)
+        tabContainer.BackgroundColor3 = Colors.Panel
+        tabContainer.BorderSizePixel = 0
+        tabContainer.Parent = mainWindow
+
+        local function createTabButton(name)
+            local btn = Instance.new("TextButton")
+            btn.Size = UDim2.new(0, 120, 1, 0)
+            btn.Position = UDim2.new(0, 120 * (#tabContainer:GetChildren()), 0, 0)
+            btn.BackgroundColor3 = (name == activeTab) and Colors.Accent or Colors.PanelLight
+            btn.Text = name
+            btn.TextColor3 = Colors.Text
+            btn.Font = Enum.Font.SourceSansBold
+            btn.TextSize = 14
+            btn.Parent = tabContainer
+            btn.MouseButton1Click:Connect(function()
+                activeTab = name
+                for _, child in ipairs(tabContainer:GetChildren()) do
+                    if child:IsA("TextButton") then
+                        child.BackgroundColor3 = (child.Text == activeTab) and Colors.Accent or Colors.PanelLight
+                    end
+                end
+                local contentFrame = mainWindow:FindFirstChild("Content")
+                if contentFrame then contentFrame:Destroy() end
+                if name == "Legit" then createLegitContent()
+                elseif name == "Configuration" then createConfigContent()
+                elseif name == "Aimbot" then createAimbotContent()
+                elseif name == "Recorder" then createRecorderContent() end
+            end)
+            return btn
+        end
+
+        createTabButton("Legit")
+        createTabButton("Configuration")
+        createTabButton("Aimbot")
+        createTabButton("Recorder")
+
+        createLegitContent()
+
+        local footer = Instance.new("TextLabel")
+        footer.Size = UDim2.new(1, 0, 0, 20)
+        footer.Position = UDim2.new(0, 0, 1, -20)
+        footer.BackgroundTransparency = 1
+        footer.Text = "Pressione [ P ] para mostrar/ocultar"
+        footer.TextColor3 = Colors.TextDim
+        footer.Font = Enum.Font.SourceSans
+        footer.TextSize = 12
+        footer.Parent = mainWindow
+    end
+
+    function createLegitContent()
+        local content = Instance.new("Frame")
+        content.Name = "Content"
+        content.Size = UDim2.new(1, -10, 1, -60)
+        content.Position = UDim2.new(0, 5, 0, 65)
+        content.BackgroundTransparency = 1
+        content.Parent = mainWindow
+
+        local function makeButton(text, y, color, callback)
+            local btn = Instance.new("TextButton")
+            btn.Size = UDim2.new(1, 0, 0, 35)
+            btn.Position = UDim2.new(0, 0, 0, y)
+            btn.BackgroundColor3 = color
+            btn.Text = text
+            btn.TextColor3 = Colors.Text
+            btn.Font = Enum.Font.SourceSansBold
+            btn.TextSize = 16
+            btn.Parent = content
+            btn.MouseButton1Click:Connect(function() callback(btn) end)
+            return btn
+        end
+
+        makeButton("Iniciar Auto JJ's", 0, Colors.Green, function(btn)
+            if CONFIG.AUTO_JJ_ENABLED then
+                stopAutoJJ(); btn.Text = "Iniciar Auto JJ's"; btn.BackgroundColor3 = Colors.Green
+            else
+                startAutoJJ(); btn.Text = "Parar Auto JJ's"; btn.BackgroundColor3 = Colors.Red
+            end
+        end)
+
+        makeButton("Iniciar Gravação", 45, Color3.fromRGB(200, 100, 0), function(btn)
+            if CONFIG.RECORDING then
+                stopRecording(); btn.Text = "Iniciar Gravação"; btn.BackgroundColor3 = Color3.fromRGB(200, 100, 0)
+            else
+                startRecording(); btn.Text = "Parar Gravação"; btn.BackgroundColor3 = Colors.Red
+            end
+        end)
+
+        makeButton("Reproduzir Rota", 90, Colors.Accent, function(btn)
+            if CONFIG.PLAYING then
+                stopPlayback(); btn.Text = "Reproduzir Rota"; btn.BackgroundColor3 = Colors.Accent
+            else
+                startPlayback(); btn.Text = "Parar Reprodução"; btn.BackgroundColor3 = Colors.Red
+            end
+        end)
+
+        makeButton("Loop: OFF", 135, Colors.Button, function(btn)
+            CONFIG.LOOP_PLAYBACK = not CONFIG.LOOP_PLAYBACK
+            btn.Text = "Loop: " .. (CONFIG.LOOP_PLAYBACK and "ON" or "OFF")
+            btn.BackgroundColor3 = CONFIG.LOOP_PLAYBACK and Colors.Green or Colors.Button
+        end)
+    end
+
+    function createConfigContent()
+        local content = Instance.new("Frame")
+        content.Name = "Content"
+        content.Size = UDim2.new(1, -10, 1, -60)
+        content.Position = UDim2.new(0, 5, 0, 65)
+        content.BackgroundTransparency = 1
+        content.Parent = mainWindow
+
+        local configLabel = Instance.new("TextLabel")
+        configLabel.Size = UDim2.new(1, 0, 0, 20)
+        configLabel.BackgroundTransparency = 1
+        configLabel.Text = "Configuration"
+        configLabel.TextColor3 = Colors.Text
+        configLabel.Font = Enum.Font.SourceSansBold
+        configLabel.TextSize = 14
+        configLabel.TextXAlignment = Enum.TextXAlignment.Left
+        configLabel.Parent = content
+
+        local nameBox = Instance.new("TextBox")
+        nameBox.Size = UDim2.new(1, 0, 0, 25)
+        nameBox.Position = UDim2.new(0, 0, 0, 25)
+        nameBox.BackgroundColor3 = Colors.Panel
+        nameBox.Text = "Config Name"
+        nameBox.TextColor3 = Colors.TextDim
+        nameBox.Font = Enum.Font.SourceSans
+        nameBox.TextSize = 14
+        nameBox.Parent = content
+
+        for i, name in ipairs({"Create", "Load", "Delete", "Save"}) do
+            local btn = Instance.new("TextButton")
+            btn.Size = UDim2.new(0.24, 0, 0, 25)
+            btn.Position = UDim2.new((i-1)*0.25, 0, 0, 55)
+            btn.BackgroundColor3 = Colors.Button
+            btn.Text = name
+            btn.TextColor3 = Colors.Text
+            btn.Font = Enum.Font.SourceSans
+            btn.TextSize = 12
+            btn.Parent = content
+        end
+
+        local otherLabel = Instance.new("TextLabel")
+        otherLabel.Size = UDim2.new(1, 0, 0, 20)
+        otherLabel.Position = UDim2.new(0, 0, 0, 90)
+        otherLabel.BackgroundTransparency = 1
+        otherLabel.Text = "Other"
+        otherLabel.TextColor3 = Colors.Text
+        otherLabel.Font = Enum.Font.SourceSansBold
+        otherLabel.TextSize = 14
+        otherLabel.TextXAlignment = Enum.TextXAlignment.Left
+        otherLabel.Parent = content
+
+        for i, name in ipairs({"Copy JobId", "Copy GameId", "Copy Game Invite", "Rejoin", "test"}) do
+            local btn = Instance.new("TextButton")
+            btn.Size = UDim2.new(1, 0, 0, 22)
+            btn.Position = UDim2.new(0, 0, 0, 115 + (i-1)*25)
+            btn.BackgroundColor3 = Colors.Button
+            btn.Text = name
+            btn.TextColor3 = Colors.Text
+            btn.Font = Enum.Font.SourceSans
+            btn.TextSize = 12
+            btn.Parent = content
+        end
+    end
+
+    function createAimbotContent()
+        local content = Instance.new("Frame")
+        content.Name = "Content"
+        content.Size = UDim2.new(1, -10, 1, -60)
+        content.Position = UDim2.new(0, 5, 0, 65)
+        content.BackgroundTransparency = 1
+        content.Parent = mainWindow
+
+        local aimLabel = Instance.new("TextLabel")
+        aimLabel.Size = UDim2.new(1, 0, 0, 20)
+        aimLabel.BackgroundTransparency = 1
+        aimLabel.Text = "Aimbot Settings"
+        aimLabel.TextColor3 = Colors.Text
+        aimLabel.Font = Enum.Font.SourceSansBold
+        aimLabel.TextSize = 14
+        aimLabel.TextXAlignment = Enum.TextXAlignment.Left
+        aimLabel.Parent = content
+
+        local toggleBtn = Instance.new("TextButton")
+        toggleBtn.Size = UDim2.new(1, 0, 0, 35)
+        toggleBtn.Position = UDim2.new(0, 0, 0, 25)
+        toggleBtn.BackgroundColor3 = Colors.Red
+        toggleBtn.Text = "Aimbot: OFF"
+        toggleBtn.TextColor3 = Colors.Text
+        toggleBtn.Font = Enum.Font.SourceSansBold
+        toggleBtn.TextSize = 16
+        toggleBtn.Parent = content
+        toggleBtn.MouseButton1Click:Connect(function()
+            if CONFIG.AIMBOT_ENABLED then
+                stopAimbot()
+                toggleBtn.Text = "Aimbot: OFF"
+                toggleBtn.BackgroundColor3 = Colors.Red
+            else
+                startAimbot()
+                toggleBtn.Text = "Aimbot: ON"
+                toggleBtn.BackgroundColor3 = Colors.Green
+            end
+            updateFOVCircle()
+        end)
+
+        local fovLabel = Instance.new("TextLabel")
+        fovLabel.Size = UDim2.new(1, 0, 0, 20)
+        fovLabel.Position = UDim2.new(0, 0, 0, 70)
+        fovLabel.BackgroundTransparency = 1
+        fovLabel.Text = "Área de Ajuste (FOV): " .. CONFIG.AIMBOT_FOV .. " px"
+        fovLabel.TextColor3 = Colors.Text
+        fovLabel.Font = Enum.Font.SourceSansBold
+        fovLabel.TextSize = 13
+        fovLabel.TextXAlignment = Enum.TextXAlignment.Left
+        fovLabel.Parent = content
+
+        local minusBtn = Instance.new("TextButton")
+        minusBtn.Size = UDim2.new(0.2, 0, 0, 30)
+        minusBtn.Position = UDim2.new(0, 0, 0, 95)
+        minusBtn.BackgroundColor3 = Colors.Button
+        minusBtn.Text = "- 10"
+        minusBtn.TextColor3 = Colors.Text
+        minusBtn.Font = Enum.Font.SourceSansBold
+        minusBtn.TextSize = 14
+        minusBtn.Parent = content
+
+        local fovBar = Instance.new("Frame")
+        fovBar.Size = UDim2.new(0.55, 0, 0, 30)
+        fovBar.Position = UDim2.new(0.225, 0, 0, 95)
+        fovBar.BackgroundColor3 = Colors.Panel
+        fovBar.BorderSizePixel = 1
+        fovBar.BorderColor3 = Colors.Border
+        fovBar.Parent = content
+
+        local fovFill = Instance.new("Frame")
+        fovFill.Size = UDim2.new(math.clamp(CONFIG.AIMBOT_FOV / 500, 0, 1), 0, 1, 0)
+        fovFill.BackgroundColor3 = Colors.Accent
+        fovFill.BorderSizePixel = 0
+        fovFill.Parent = fovBar
+
+        local plusBtn = Instance.new("TextButton")
+        plusBtn.Size = UDim2.new(0.2, 0, 0, 30)
+        plusBtn.Position = UDim2.new(0.8, 0, 0, 95)
+        plusBtn.BackgroundColor3 = Colors.Button
+        plusBtn.Text = "+ 10"
+        plusBtn.TextColor3 = Colors.Text
+        plusBtn.Font = Enum.Font.SourceSansBold
+        plusBtn.TextSize = 14
+        plusBtn.Parent = content
+
+        local function updateFOV(newValue)
+            CONFIG.AIMBOT_FOV = math.clamp(newValue, 10, 500)
+            fovLabel.Text = "Área de Ajuste (FOV): " .. CONFIG.AIMBOT_FOV .. " px"
+            fovFill.Size = UDim2.new(CONFIG.AIMBOT_FOV / 500, 0, 1, 0)
+            updateFOVCircle()
+        end
+
+        minusBtn.MouseButton1Click:Connect(function() updateFOV(CONFIG.AIMBOT_FOV - 10) end)
+        plusBtn.MouseButton1Click:Connect(function() updateFOV(CONFIG.AIMBOT_FOV + 10) end)
+
+        local showFovBtn = Instance.new("TextButton")
+        showFovBtn.Size = UDim2.new(1, 0, 0, 30)
+        showFovBtn.Position = UDim2.new(0, 0, 0, 140)
+        showFovBtn.BackgroundColor3 = CONFIG.AIMBOT_SHOW_FOV and Colors.Green or Colors.Button
+        showFovBtn.Text = "Mostrar Círculo FOV: " .. (CONFIG.AIMBOT_SHOW_FOV and "ON" or "OFF")
+        showFovBtn.TextColor3 = Colors.Text
+        showFovBtn.Font = Enum.Font.SourceSansBold
+        showFovBtn.TextSize = 14
+        showFovBtn.Parent = content
+        showFovBtn.MouseButton1Click:Connect(function()
+            CONFIG.AIMBOT_SHOW_FOV = not CONFIG.AIMBOT_SHOW_FOV
+            showFovBtn.Text = "Mostrar Círculo FOV: " .. (CONFIG.AIMBOT_SHOW_FOV and "ON" or "OFF")
+            showFovBtn.BackgroundColor3 = CONFIG.AIMBOT_SHOW_FOV and Colors.Green or Colors.Button
+            updateFOVCircle()
+        end)
+
+        local teamBtn = Instance.new("TextButton")
+        teamBtn.Size = UDim2.new(1, 0, 0, 30)
+        teamBtn.Position = UDim2.new(0, 0, 0, 175)
+        teamBtn.BackgroundColor3 = CONFIG.AIMBOT_TEAM_CHECK and Colors.Green or Colors.Button
+        teamBtn.Text = "Ignorar Aliados: " .. (CONFIG.AIMBOT_TEAM_CHECK and "ON" or "OFF")
+        teamBtn.TextColor3 = Colors.Text
+        teamBtn.Font = Enum.Font.SourceSansBold
+        teamBtn.TextSize = 14
+        teamBtn.Parent = content
+        teamBtn.MouseButton1Click:Connect(function()
+            CONFIG.AIMBOT_TEAM_CHECK = not CONFIG.AIMBOT_TEAM_CHECK
+            teamBtn.Text = "Ignorar Aliados: " .. (CONFIG.AIMBOT_TEAM_CHECK and "ON" or "OFF")
+            teamBtn.BackgroundColor3 = CONFIG.AIMBOT_TEAM_CHECK and Colors.Green or Colors.Button
+        end)
+
+        local partBtn = Instance.new("TextButton")
+        partBtn.Size = UDim2.new(1, 0, 0, 30)
+        partBtn.Position = UDim2.new(0, 0, 0, 210)
+        partBtn.BackgroundColor3 = Colors.Button
+        partBtn.Text = "Alvo: " .. CONFIG.AIMBOT_TARGET_PART
+        partBtn.TextColor3 = Colors.Text
+        partBtn.Font = Enum.Font.SourceSansBold
+        partBtn.TextSize = 14
+        partBtn.Parent = content
+        partBtn.MouseButton1Click:Connect(function()
+            CONFIG.AIMBOT_TARGET_PART = (CONFIG.AIMBOT_TARGET_PART == "Head") and "HumanoidRootPart" or "Head"
+            partBtn.Text = "Alvo: " .. CONFIG.AIMBOT_TARGET_PART
+        end)
+    end
+
+    function createRecorderContent()
+        local content = Instance.new("Frame")
+        content.Name = "Content"
+        content.Size = UDim2.new(1, -10, 1, -60)
+        content.Position = UDim2.new(0, 5, 0, 65)
+        content.BackgroundTransparency = 1
+        content.Parent = mainWindow
+
+        local recLabel = Instance.new("TextLabel")
+        recLabel.Size = UDim2.new(1, 0, 0, 20)
+        recLabel.BackgroundTransparency = 1
+        recLabel.Text = "Route Recorder"
+        recLabel.TextColor3 = Colors.Text
+        recLabel.Font = Enum.Font.SourceSansBold
+        recLabel.TextSize = 14
+        recLabel.TextXAlignment = Enum.TextXAlignment.Left
+        recLabel.Parent = content
+
+        local recBtn = Instance.new("TextButton")
+        recBtn.Size = UDim2.new(1, 0, 0, 35)
+        recBtn.Position = UDim2.new(0, 0, 0, 25)
+        recBtn.BackgroundColor3 = Color3.fromRGB(200, 100, 0)
+        recBtn.Text = "Iniciar Gravação"
+        recBtn.TextColor3 = Colors.Text
+        recBtn.Font = Enum.Font.SourceSansBold
+        recBtn.TextSize = 16
+        recBtn.Parent = content
+        recBtn.MouseButton1Click:Connect(function()
+            if CONFIG.RECORDING then
+                stopRecording()
+                recBtn.Text = "Iniciar Gravação"
+                recBtn.BackgroundColor3 = Color3.fromRGB(200, 100, 0)
+            else
+                startRecording()
+                recBtn.Text = "Parar Gravação"
+                recBtn.BackgroundColor3 = Colors.Red
+            end
+        end)
+
+        local playBtn = Instance.new("TextButton")
+        playBtn.Size = UDim2.new(1, 0, 0, 35)
+        playBtn.Position = UDim2.new(0, 0, 0, 65)
+        playBtn.BackgroundColor3 = Colors.Accent
+        playBtn.Text = "Reproduzir Rota"
+        playBtn.TextColor3 = Colors.Text
+        playBtn.Font = Enum.Font.SourceSansBold
+        playBtn.TextSize = 16
+        playBtn.Parent = content
+        playBtn.MouseButton1Click:Connect(function()
+            if CONFIG.PLAYING then
+                stopPlayback()
+                playBtn.Text = "Reproduzir Rota"
+                playBtn.BackgroundColor3 = Colors.Accent
+            else
+                startPlayback()
+                playBtn.Text = "Parar Reprodução"
+                playBtn.BackgroundColor3 = Colors.Red
+            end
+        end)
+
+        local loopBtn = Instance.new("TextButton")
+        loopBtn.Size = UDim2.new(1, 0, 0, 30)
+        loopBtn.Position = UDim2.new(0, 0, 0, 105)
+        loopBtn.BackgroundColor3 = CONFIG.LOOP_PLAYBACK and Colors.Green or Colors.Button
+        loopBtn.Text = "Loop: " .. (CONFIG.LOOP_PLAYBACK and "ON" or "OFF")
+        loopBtn.TextColor3 = Colors.Text
+        loopBtn.Font = Enum.Font.SourceSansBold
+        loopBtn.TextSize = 14
+        loopBtn.Parent = content
+        loopBtn.MouseButton1Click:Connect(function()
+            CONFIG.LOOP_PLAYBACK = not CONFIG.LOOP_PLAYBACK
+            loopBtn.Text = "Loop: " .. (CONFIG.LOOP_PLAYBACK and "ON" or "OFF")
+            loopBtn.BackgroundColor3 = CONFIG.LOOP_PLAYBACK and Colors.Green or Colors.Button
+        end)
+
+        local speedLabel = Instance.new("TextLabel")
+        speedLabel.Size = UDim2.new(1, 0, 0, 20)
+        speedLabel.Position = UDim2.new(0, 0, 0, 140)
+        speedLabel.BackgroundTransparency = 1
+        speedLabel.Text = "Velocidade: " .. CONFIG.PLAYBACK_SPEED .. "x"
+        speedLabel.TextColor3 = Colors.Text
+        speedLabel.Font = Enum.Font.SourceSansBold
+        speedLabel.TextSize = 13
+        speedLabel.TextXAlignment = Enum.TextXAlignment.Left
+        speedLabel.Parent = content
+
+        local speedMinus = Instance.new("TextButton")
+        speedMinus.Size = UDim2.new(0.2, 0, 0, 30)
+        speedMinus.Position = UDim2.new(0, 0, 0, 165)
+        speedMinus.BackgroundColor3 = Colors.Button
+        speedMinus.Text = "-"
+        speedMinus.TextColor3 = Colors.Text
+        speedMinus.Font = Enum.Font.SourceSansBold
+        speedMinus.TextSize = 16
+        speedMinus.Parent = content
+
+        local speedPlus = Instance.new("TextButton")
+        speedPlus.Size = UDim2.new(0.2, 0, 0, 30)
+        speedPlus.Position = UDim2.new(0.8, 0, 0, 165)
+        speedPlus.BackgroundColor3 = Colors.Button
+        speedPlus.Text = "+"
+        speedPlus.TextColor3 = Colors.Text
+        speedPlus.Font = Enum.Font.SourceSansBold
+        speedPlus.TextSize = 16
+        speedPlus.Parent = content
+
+        local speedBar = Instance.new("Frame")
+        speedBar.Size = UDim2.new(0.55, 0, 0, 30)
+        speedBar.Position = UDim2.new(0.225, 0, 0, 165)
+        speedBar.BackgroundColor3 = Colors.Panel
+        speedBar.BorderSizePixel = 1
+        speedBar.BorderColor3 = Colors.Border
+        speedBar.Parent = content
+
+        local speedFill = Instance.new("Frame")
+        speedFill.Size = UDim2.new(math.clamp(CONFIG.PLAYBACK_SPEED / 2, 0, 1), 0, 1, 0)
+        speedFill.BackgroundColor3 = Colors.Accent
+        speedFill.BorderSizePixel = 0
+        speedFill.Parent = speedBar
+
+        local function updateSpeed(delta)
+            CONFIG.PLAYBACK_SPEED = math.clamp(CONFIG.PLAYBACK_SPEED + delta, 0.5, 2.0)
+            speedLabel.Text = "Velocidade: " .. string.format("%.1f", CONFIG.PLAYBACK_SPEED) .. "x"
+            speedFill.Size = UDim2.new(CONFIG.PLAYBACK_SPEED / 2, 0, 1, 0)
+        end
+
+        speedMinus.MouseButton1Click:Connect(function() updateSpeed(-0.1) end)
+        speedPlus.MouseButton1Click:Connect(function() updateSpeed(0.1) end)
+
+        local noclipBtn = Instance.new("TextButton")
+        noclipBtn.Size = UDim2.new(1, 0, 0, 30)
+        noclipBtn.Position = UDim2.new(0, 0, 0, 205)
+        noclipBtn.BackgroundColor3 = CONFIG.NOCLIP_ENABLED and Colors.Green or Colors.Button
+        noclipBtn.Text = "Noclip: " .. (CONFIG.NOCLIP_ENABLED and "ON" or "OFF")
+        noclipBtn.TextColor3 = Colors.Text
+        noclipBtn.Font = Enum.Font.SourceSansBold
+        noclipBtn.TextSize = 14
+        noclipBtn.Parent = content
+        noclipBtn.MouseButton1Click:Connect(function()
+            CONFIG.NOCLIP_ENABLED = not CONFIG.NOCLIP_ENABLED
+            noclipBtn.Text = "Noclip: " .. (CONFIG.NOCLIP_ENABLED and "ON" or "OFF")
+            noclipBtn.BackgroundColor3 = CONFIG.NOCLIP_ENABLED and Colors.Green or Colors.Button
+        end)
+
+        local syncBtn = Instance.new("TextButton")
+        syncBtn.Size = UDim2.new(1, 0, 0, 30)
+        syncBtn.Position = UDim2.new(0, 0, 0, 240)
+        syncBtn.BackgroundColor3 = CONFIG.SYNC_CAMERA and Colors.Green or Colors.Button
+        syncBtn.Text = "Sincronizar Câmera: " .. (CONFIG.SYNC_CAMERA and "ON" or "OFF")
+        syncBtn.TextColor3 = Colors.Text
+        syncBtn.Font = Enum.Font.SourceSansBold
+        syncBtn.TextSize = 14
+        syncBtn.Parent = content
+        syncBtn.MouseButton1Click:Connect(function()
+            CONFIG.SYNC_CAMERA = not CONFIG.SYNC_CAMERA
+            syncBtn.Text = "Sincronizar Câmera: " .. (CONFIG.SYNC_CAMERA and "ON" or "OFF")
+            syncBtn.BackgroundColor3 = CONFIG.SYNC_CAMERA and Colors.Green or Colors.Button
+        end)
+
+        local saveBtn = Instance.new("TextButton")
+        saveBtn.Size = UDim2.new(0.48, 0, 0, 30)
+        saveBtn.Position = UDim2.new(0, 0, 0, 280)
+        saveBtn.BackgroundColor3 = Colors.Button
+        saveBtn.Text = "Salvar Rota"
+        saveBtn.TextColor3 = Colors.Text
+        saveBtn.Font = Enum.Font.SourceSansBold
+        saveBtn.TextSize = 14
+        saveBtn.Parent = content
+        saveBtn.MouseButton1Click:Connect(saveRoute)
+
+        local loadBtn = Instance.new("TextButton")
+        loadBtn.Size = UDim2.new(0.48, 0, 0, 30)
+        loadBtn.Position = UDim2.new(0.52, 0, 0, 280)
+        loadBtn.BackgroundColor3 = Colors.Button
+        loadBtn.Text = "Carregar Rota"
+        loadBtn.TextColor3 = Colors.Text
+        loadBtn.Font = Enum.Font.SourceSansBold
+        loadBtn.TextSize = 14
+        loadBtn.Parent = content
+        loadBtn.MouseButton1Click:Connect(loadRoute)
+    end
+
+    -- ==================== TOGGLE DO MENU (TECLA P) ====================
+    local function setupMenuToggle()
+        UserInputService.InputBegan:Connect(function(input, gameProcessed)
+            if gameProcessed then return end
+            if input.KeyCode == CONFIG.TOGGLE_KEY then
+                if mainWindow then
+                    menuVisible = not menuVisible
+                    mainWindow.Visible = menuVisible
+                    if fovCircle then fovCircle.Visible = menuVisible and CONFIG.AIMBOT_SHOW_FOV and CONFIG.AIMBOT_ENABLED end
+                end
+            end
+        end)
+    end
+
+    -- ==================== INICIALIZAÇÃO ====================
+    createWindow()
+    createFOVCircle()
+    setupMenuToggle()
+    notify("Script Carregado", "Interface Octernal com Recorder Avançado! Pressione P para ocultar.", 5)
+
+end) -- fim do callback do Key System
